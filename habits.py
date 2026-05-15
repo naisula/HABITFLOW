@@ -115,3 +115,16 @@ class HabitManager:
 
         conn.commit()
         conn.close()
+def update_habit(self, habit_id, new_name):
+
+    conn = self.db.connect()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE habits
+    SET name = ?
+    WHERE id = ?
+    """, (new_name, habit_id))
+
+    conn.commit()
+    conn.close() 

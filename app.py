@@ -223,6 +223,28 @@ elif menu == "View Habits":
                 st.markdown(f"""
                 ### {habit[1]}
                 """)
+                with st.expander("Edit Habit"):
+
+                    updated_name = st.text_input(
+                        "New Habit Name",
+                        value=habit[1],
+                        key=f"edit_habit_{habit[0]}"
+                    )
+
+                    if st.button(
+                        "Save Habit",
+                        key=f"save_habit_{habit[0]}"
+                    ):
+
+                        habits.update_habit(
+                            habit[0],
+                            updated_name
+                        )
+
+                        st.success("Habit updated!")
+
+                        st.rerun()
+
 
 
                 completed_today = habits.is_habit_completed_today(habit[0])
@@ -256,6 +278,27 @@ elif menu == "View Habits":
                     
                     with goal_col2:
                         st.write(goal[2])
+                        with st.expander("Edit Goal"):
+
+                            updated_goal = st.text_input(
+                                "New Goal",
+                                value=goal[2],
+                                key=f"edit_goal_{goal[0]}"
+                            )
+
+                            if st.button(
+                                "Save Goal",
+                                key=f"save_goal_{goal[0]}"
+                            ):
+
+                                goals.update_goal(
+                                    goal[0],
+                                    updated_goal
+                                )
+
+                                st.success("Goal updated!")
+
+                                st.rerun()
 
                     
                     with goal_col3:
@@ -370,6 +413,27 @@ elif menu == "View Tasks":
 
         with col2:
             st.write(task[1])
+            with st.expander("Edit Task"):
+
+                updated_task = st.text_input(
+                    "New Task",
+                    value=task[1],
+                    key=f"edit_task_{task[0]}"
+                )
+
+                if st.button(
+                    "Save Task",
+                    key=f"save_task_{task[0]}"
+                ):
+
+                    tasks.update_task(
+                        task[0],
+                        updated_task
+                    )
+
+                    st.success("Task updated!")
+
+                    st.rerun()
 
         with col3:
 

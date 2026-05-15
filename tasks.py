@@ -38,6 +38,7 @@ class TaskManager:
 
         conn.commit()
         conn.close()
+        
     def delete_task(self, task_id):
 
         conn = self.db.connect()
@@ -47,6 +48,20 @@ class TaskManager:
         DELETE FROM tasks
         WHERE id = ?
         """, (task_id,))
+
+        conn.commit()
+        conn.close()
+        
+    def update_task(self, task_id, new_title):
+
+        conn = self.db.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        UPDATE tasks
+        SET title = ?
+        WHERE id = ?
+        """, (new_title, task_id))
 
         conn.commit()
         conn.close()

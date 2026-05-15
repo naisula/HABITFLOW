@@ -126,3 +126,16 @@ class GoalManager:
         conn.close()
 
         return data[0] == 1 if data else False
+    def update_goal(self, goal_id, new_goal):
+
+        conn = self.db.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        UPDATE habit_goals
+        SET goal = ?
+        WHERE id = ?
+        """, (new_goal, goal_id))
+
+        conn.commit()
+        conn.close()
