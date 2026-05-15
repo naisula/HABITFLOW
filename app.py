@@ -125,22 +125,13 @@ if menu == "Dashboard":
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric(
-            "Habits",
-            len(habits_data)
-        )
+        st.metric("Habits",len(habits_data))
 
     with col2:
-        st.metric(
-            "Goals",
-            len(goals_data)
-        )
+        st.metric("Goals",len(goals_data))
 
     with col3:
-        st.metric(
-            "Tasks",
-            len(tasks_data)
-        )
+        st.metric("Tasks",len(tasks_data))
 
     st.divider()
 
@@ -168,7 +159,8 @@ if menu == "Dashboard":
         st.info("No habits added yet.")
 
     st.divider()
-     # aesthetic quote card
+
+    # aesthetic quote card
     st.subheader("Daily Motivation")
 
     st.markdown(f"""
@@ -194,7 +186,7 @@ elif menu == "Add Habit":
 
     st.header("Add Habit")
 
-    habit_name = st.text_input("Enter Habit Name")
+    habit_name = st.text_input("Enter Habit ")
 
     if st.button("Add Habit"):
         habits.add_habit(habit_name)
@@ -203,12 +195,40 @@ elif menu == "Add Habit":
 
 elif menu == "View Habits":
 
-    st.header("Your Habits")
+    st.header("Habits")
+
+    @st.dialog("Delete Habit")
+    def delete_habit_dialog():
+
+        habit_id = st.session_state["delete_habit_id"]
+        habit_name = st.session_state["delete_habit_name"]
+
+        st.write(f"Are you sure you want to delete **{habit_name}**?")
+
+        c1, c2 = st.columns(2)
+
+        with c1:
+            if st.button("Yes"):
+
+                habits.delete_habit(habit_id)
+
+                st.session_state["delete_habit_id"] = None
+                st.session_state["delete_habit_name"] = None
+
+                st.rerun()
+
+        with c2:
+            if st.button("No"):
+
+                st.session_state["delete_habit_id"] = None
+                st.session_state["delete_habit_name"] = None
+
+                st.rerun()
 
     habits_data = habits.view_habits()
 
     for habit in habits_data:
-
+    
         with st.container():
 
             col1, col2, col3 = st.columns([1, 6, 1])
@@ -220,21 +240,17 @@ elif menu == "View Habits":
          
             with col2:
 
-                st.markdown(f"""
-                ### {habit[1]}
-                """)
-                with st.expander("Edit Habit"):
+                st.markdown(f"### {habit[1]}")
+
+                with st.expander("Edit"):
 
                     updated_name = st.text_input(
-                        "New Habit Name",
+                        "New Habit",
                         value=habit[1],
                         key=f"edit_habit_{habit[0]}"
                     )
 
-                    if st.button(
-                        "Save Habit",
-                        key=f"save_habit_{habit[0]}"
-                    ):
+                    if st.button("Save Habit",key=f"save_habit_{habit[0]}"):
 
                         habits.update_habit(
                             habit[0],
@@ -259,11 +275,14 @@ elif menu == "View Habits":
 
                     habits.complete_habit(habit[0])
                     st.rerun()
+                    
 
                 elif not habit_checked and completed_today:
 
                     habits.uncomplete_habit(habit[0])
                     st.rerun()
+                    
+                
 
                 goals_data = goals.get_goals_by_habit(habit[0])
 
@@ -278,6 +297,7 @@ elif menu == "View Habits":
                     
                     with goal_col2:
                         st.write(goal[2])
+
                         with st.expander("Edit Goal"):
 
                             updated_goal = st.text_input(
@@ -324,14 +344,52 @@ elif menu == "View Habits":
                     
                     with goal_col4:
 
-                        if st.button(
-                            "Del",
-                            key=f"goal_delete_{goal[0]}"
-                        ):
+                        if f"confirm_delete_goal_{goal[0]}" not in st.session_state:
+                            st.session_state[f"confirm_delete_goal_{goal[0]}"] = False
 
-                            goals.delete_goal(goal[0])
+                        if not st.session_state[f"confirm_delete_goal_{goal[0]}"]:
 
-                            st.rerun()
+                            if st.button(
+                                "Del",
+                                key=f"goal_delete_{goal[0]}"
+                            ):
+
+                                st.session_state[f"confirm_delete_goal_{goal[0]}"] = True
+                                st.rerun()
+
+                        else:
+
+                            st.warning("Are you sure you want to delete this goal?")
+
+                            c1, c2 = st.columns(2)
+
+                            with c1:
+                                if st.button("Yes", key=f"yes_goal_{goal[0]}"):
+
+                                    goals.delete_goal(goal[0])
+
+                                    st.session_state[f"confirm_delete_goal_{goal[0]}"] = False
+
+                                    st.rerun()
+
+                            with c2:
+                                if st.button("No", key=f"no_goal_{goal[0]}"):
+
+                                    st.session_state[f"confirm_delete_goal_{goal[0]}"] = False
+
+                                    st.rerun()
+
+            with col3:
+
+                if st.button("Del", key=f"delete_habit_{habit[0]}"):
+
+                    st.session_state["delete_habit_id"] = habit[0]
+                    st.session_state["delete_habit_name"] = habit[1]
+
+                    delete_habit_dialog()
+
+                
+                
 elif menu == "Add Goal":
 
     st.header("Add Habit Goal")
@@ -344,6 +402,7 @@ elif menu == "Add Goal":
     }
 
     if habit_options:
+
         selected_habit = st.selectbox(
             "Select Habit",
             list(habit_options.keys())
@@ -359,6 +418,7 @@ elif menu == "Add Goal":
             )
 
             st.success("Goal added successfully!")
+
     else:
         st.warning("Please add a habit first!")
 
@@ -367,17 +427,79 @@ elif menu == "View Goals":
 
     st.header("Your Goals")
 
+    @st.dialog("Delete Goal")
+    def delete_goal_dialog():
+
+        goal_id = st.session_state["delete_goal_id"]
+        goal_name = st.session_state["delete_goal_name"]
+
+        st.write(f"Are you sure you want to delete **{goal_name}**?")
+
+        c1, c2 = st.columns(2)
+
+        with c1:
+            if st.button("Yes"):
+
+                goals.delete_goal(goal_id)
+
+                st.session_state["delete_goal_id"] = None
+                st.session_state["delete_goal_name"] = None
+
+                st.rerun()
+
+        with c2:
+            if st.button("No"):
+
+                st.session_state["delete_goal_id"] = None
+                st.session_state["delete_goal_name"] = None
+
+                st.rerun()
+
     goals_data = goals.view_goals()
 
     for goal in goals_data:
 
-        col1, col2 = st.columns([1, 10])
+        with st.container():
 
-        with col1:
-            st.image("goals.png", width=30)
+            col1, col2, col3 = st.columns([1, 8, 2])
 
-        with col2:
-            st.markdown(f"**{goal[2]}**")
+            with col1:
+                st.image("goals.png", width=30)
+
+            with col2:
+
+                st.markdown(f"**{goal[2]}**")
+
+                with st.expander("Edit Goal"):
+
+                    updated_goal = st.text_input(
+                        "New Goal",
+                        value=goal[2],
+                        key=f"edit_goal_page_{goal[0]}"
+                    )
+
+                    if st.button(
+                        "Save Goal",
+                        key=f"save_goal_page_{goal[0]}"
+                    ):
+
+                        goals.update_goal(
+                            goal[0],
+                            updated_goal
+                        )
+
+                        st.success("Goal updated!")
+
+                        st.rerun()
+
+            with col3:
+
+                if st.button("Del", key=f"delete_goal_page_{goal[0]}"):
+
+                    st.session_state["delete_goal_id"] = goal[0]
+                    st.session_state["delete_goal_name"] = goal[2]
+
+                    delete_goal_dialog()
 
 
 elif menu == "Add Task":
@@ -402,46 +524,76 @@ elif menu == "View Tasks":
 
     st.header("Your Daily Todos")
 
+    @st.dialog("Delete Task")
+    def delete_task_dialog():
+
+        task_id = st.session_state["delete_task_id"]
+        task_name = st.session_state["delete_task_name"]
+
+        st.write(f"Are you sure you want to delete **{task_name}**?")
+
+        c1, c2 = st.columns(2)
+
+        with c1:
+            if st.button("Yes"):
+
+                tasks.delete_task(task_id)
+
+                st.session_state["delete_task_id"] = None
+                st.session_state["delete_task_name"] = None
+
+                st.rerun()
+
+        with c2:
+            if st.button("No"):
+
+                st.session_state["delete_task_id"] = None
+                st.session_state["delete_task_name"] = None
+
+                st.rerun()
+
     data = tasks.view_tasks()
 
     for task in data:
 
-        col1, col2, col3 = st.columns([1, 6, 1])
+        with st.container():
 
-        with col1:
-            st.image("tasks.png", width=30)
+            col1, col2, col3 = st.columns([1, 6, 2])
 
-        with col2:
-            st.write(task[1])
-            with st.expander("Edit Task"):
+            with col1:
+                st.image("tasks.png", width=30)
 
-                updated_task = st.text_input(
-                    "New Task",
-                    value=task[1],
-                    key=f"edit_task_{task[0]}"
-                )
+            with col2:
 
-                if st.button(
-                    "Save Task",
-                    key=f"save_task_{task[0]}"
-                ):
+                st.write(task[1])
 
-                    tasks.update_task(
-                        task[0],
-                        updated_task
+                with st.expander("Edit Task"):
+
+                    updated_task = st.text_input(
+                        "New Task",
+                        value=task[1],
+                        key=f"edit_task_{task[0]}"
                     )
 
-                    st.success("Task updated!")
+                    if st.button(
+                        "Save Task",
+                        key=f"save_task_{task[0]}"
+                    ):
 
-                    st.rerun()
+                        tasks.update_task(
+                            task[0],
+                            updated_task
+                        )
 
-        with col3:
+                        st.success("Task updated!")
 
-            if st.button(
-                "Del",
-                key=f"task_{task[0]}"
-            ):
+                        st.rerun()
 
-                tasks.delete_task(task[0])
+            with col3:
 
-                st.rerun()
+                if st.button("Del", key=f"task_{task[0]}"):
+
+                    st.session_state["delete_task_id"] = task[0]
+                    st.session_state["delete_task_name"] = task[1]
+
+                    delete_task_dialog()

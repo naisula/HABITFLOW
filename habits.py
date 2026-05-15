@@ -44,18 +44,6 @@ class HabitManager:
         conn.commit()
         conn.close()
 
-    def delete_habit(self, habit_id):
-
-        conn = self.db.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-        DELETE FROM habits
-        WHERE id = ?
-        """, (habit_id,))
-
-        conn.commit()
-        conn.close()
 
     def complete_habit(self, habit_id):
 
@@ -100,6 +88,7 @@ class HabitManager:
         conn.close()
 
         return data is not None
+    
     def uncomplete_habit(self, habit_id):
 
         conn = self.db.connect()
@@ -115,16 +104,43 @@ class HabitManager:
 
         conn.commit()
         conn.close()
-def update_habit(self, habit_id, new_name):
 
-    conn = self.db.connect()
-    cursor = conn.cursor()
+    def update_habit(self, habit_id, new_name):
 
-    cursor.execute("""
-    UPDATE habits
-    SET name = ?
-    WHERE id = ?
-    """, (new_name, habit_id))
+        conn = self.db.connect()
+        cursor = conn.cursor()
 
-    conn.commit()
-    conn.close() 
+        cursor.execute("""
+        UPDATE habits
+        SET name = ?
+        WHERE id = ?
+        """, (new_name, habit_id))
+
+        conn.commit()
+        conn.close() 
+
+    def delete_habit(self, habit_id):
+
+        conn = self.db.connect()
+        cursor = conn.cursor()
+
+        
+        cursor.execute("""
+        DELETE FROM habit_goals
+        WHERE habit_id = ?
+        """, (habit_id,))
+
+    
+        cursor.execute("""
+        DELETE FROM habit_logs
+        WHERE habit_id = ?
+        """, (habit_id,))
+
+        
+        cursor.execute("""
+        DELETE FROM habits
+        WHERE id = ?
+        """, (habit_id,))
+
+        conn.commit()
+        conn.close()

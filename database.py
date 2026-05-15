@@ -60,3 +60,23 @@ class Database:
 
         conn.commit()
         conn.close()
+    
+    def migrate(self):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        tables = ["habits", "tasks", "goals"]
+
+        for table in tables:
+
+            cursor.execute(f"PRAGMA table_info({table})")
+            columns = [col[1] for col in cursor.fetchall()]
+
+            if "is_deleted" not in columns:
+                cursor.execute(f"""
+                ALTER TABLE {table}
+                ADD COLUMN is_deleted INTEGER DEFAULT 0
+                """)
+
+        conn.commit()
+        conn.close()
