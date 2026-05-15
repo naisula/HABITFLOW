@@ -4,6 +4,7 @@ from habits import HabitManager
 from tasks import TaskManager
 from goals import GoalManager
 from PIL import Image
+from quotes_api import get_quote
 
 # This is the page configuration
 st.set_page_config(
@@ -167,11 +168,26 @@ if menu == "Dashboard":
         st.info("No habits added yet.")
 
     st.divider()
+     # aesthetic quote card
+    st.subheader("Daily Motivation")
 
+    st.markdown(f"""
+    <div style="
+        background-color:#f2dde3;
+        padding:20px;
+        border-radius:20px;
+        color:#6b4f4f;
+        font-size:18px;
+        font-style:italic;
+        text-align:center;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    ">
+
+    {get_quote()}
+    </div>
+    """, unsafe_allow_html=True)
     
-    st.info(
-        "Small daily actions create long term change."
-    )
+    
 
 
 elif menu == "Add Habit":

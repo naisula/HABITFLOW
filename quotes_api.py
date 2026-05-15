@@ -2,7 +2,7 @@ import requests
 import streamlit as st
 
 
-@st.cache_data
+@st.cache_data(ttl=60)
 def get_quote():
 
     try:
