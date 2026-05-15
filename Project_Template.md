@@ -6,6 +6,7 @@ HABITFLOW
 This is a personal project . Ive struggled to track my habits on books and even downloaded apps but they did not feel tailored to my needs. My project combines both habit tracking and planning to create a more structured approach to productivity
 
 
+
 2. What tools did you use?
 > Python? GeoPanadas? Google Big Query?
 > Tell your audience how you got the answer,  tools show your capability
@@ -13,7 +14,7 @@ This is a personal project . Ive struggled to track my habits on books and even 
 
 Python - programming language
 SQL - manage data, allows me to interact with databases, stores habits, task entries and completion status
-
+streamlit - used to transfrom the command line application into a modern interactive webinterface
 
 
 
